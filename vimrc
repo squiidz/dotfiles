@@ -451,7 +451,7 @@ au FileType nginx setlocal noet ts=4 sw=4 sts=4
 
 " Go settings
 au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
-" au BufNewFile,BufRead *.go setlocal noet ts=8 sw=8 sts=8
+" au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 
 " coffeescript settings
 autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
