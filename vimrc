@@ -88,7 +88,6 @@ set nocursorcolumn
 set nocursorline
 syntax sync minlines=256
 set synmaxcol=128
-set re=1
 
 
 set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
