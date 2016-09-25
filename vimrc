@@ -41,7 +41,8 @@ set number                      " Show line numbers
 set backspace=indent,eol,start  " Makes backspace key more powerful.
 set showcmd                     " Show me what I'm typing
 set showmode                    " Show current mode.
-
+set relativenumber
+set number
 set noswapfile                  " Don't use swapfile
 set nobackup            	    " Don't create annoying backup files
 set splitright                  " Split vertical windows right to the current windows
@@ -50,7 +51,6 @@ set encoding=utf-8              " Set default encoding to UTF-8
 set autowrite                   " Automatically save before :next, :make etc.
 set autoread                    " Automatically reread changed files without asking me anything
 set laststatus=2
-
 set fileformats=unix,dos,mac    " Prefer Unix over Windows over OS 9 formats
 
 " Airline Config
@@ -515,7 +515,7 @@ com! JSONFormat %!python -m json.tool
 " ----------------------------------------- "
 
 " ==================== CtrlP ====================
-let g:ctrlp_cmd = 'CtrlPMRU'
+let g:ctrlp_cmd = 'CtrlP'
 "let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
 let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 let g:ctrlp_working_path_mode = 'ra'
@@ -527,6 +527,11 @@ let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
 let g:ctrlp_follow_symslinks = 1
+
+if exists("g:ctrlp_user_command")
+	  unlet g:ctrlp_user_command
+  endif
+  set wildignore+=*\\vendor\\**
 
 func! MyPrtMappings()
     let g:ctrlp_prompt_mappings = {
@@ -556,7 +561,10 @@ let g:ctrlp_buftag_types = {
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 
-let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$'
+let g:ctrlp_custom_ignore = {
+			\'dir': '\v[\/](\.git|node_modules|\.sass-cache|bower_components|build)$',  
+\ }
+
 " get me a list of files in the current dir
 if has("gui_macvim")
     nmap <C-f> :CtrlPCurWD<cr>
