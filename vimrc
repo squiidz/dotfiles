@@ -1,16 +1,20 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
+set shell=/bin/zsh
 call vundle#begin()
 
+"Plugin 'JazzCore/ctrlp-cmatcher'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'tpope/vim-rails'
+Plugin 'vim-ruby/vim-ruby'
 Plugin 'gmarik/Vundle.vim'
+Plugin 'rust-lang/rust.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'git://git.wincent.com/command-t.git'
-Plugin 'fatih/vim-go' 
-Plugin 'fatih/vim-nginx' 
-Plugin 'derekwyatt/vim-scala'
-Plugin 'kien/ctrlp.vim'
+Plugin 'fatih/vim-go'
+Plugin 'fatih/vim-nginx'
 Plugin 'mileszs/ack.vim'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'scrooloose/nerdtree'
@@ -18,14 +22,13 @@ Plugin 'SirVer/ultisnips'
 Plugin 'Raimondi/delimitMate'
 Plugin 't9md/vim-choosewin'
 Plugin 'fatih/molokai'
-Plugin 'kchmck/vim-coffee-script'
 Plugin 'tomtom/tcomment_vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'ekalinin/Dockerfile.vim'
-Plugin 'JazzCore/ctrlp-cmatcher'
-Plugin 'bling/vim-airline'
 Plugin 'cespare/vim-toml'
+Plugin 'bling/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -51,7 +54,7 @@ set laststatus=2
 set fileformats=unix,dos,mac    " Prefer Unix over Windows over OS 9 formats
 
 " Airline Config
-  let g:airline_theme='badwolf' 
+  let g:airline_theme='badwolf'
   if !exists('g:airline_symbols')
     let g:airline_symbols = {}
   endif
@@ -71,7 +74,7 @@ set fileformats=unix,dos,mac    " Prefer Unix over Windows over OS 9 formats
   let g:airline_symbols.whitespace = 'Ξ'
 
 "http://stackoverflow.com/questions/20186975/vim-mac-how-to-copy-to-clipboard-without-pbcopy
-set clipboard^=unnamed 
+set clipboard^=unnamed
 set clipboard^=unnamedplus
 
 set noshowmatch                 " Do not show matching brackets by flickering
@@ -81,7 +84,7 @@ set incsearch                   " Shows the match while typing
 set hlsearch                    " Highlight found searches
 set ignorecase                  " Search case insensitive...
 set smartcase                   " ... but not when search pattern contains upper case characters
-set ttyfast 
+set ttyfast
 
 " speed up syntax highlighting
 set nocursorcolumn
@@ -326,7 +329,7 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
 " object of the given type.  These don't necessarily have to be in the current
 " line.
 "
-" Currently works for (, [, {, and their shortcuts b, r, B. 
+" Currently works for (, [, {, and their shortcuts b, r, B.
 "
 " Next kind of works for ' and " as long as there are no escaped versions of
 " them in the string (TODO: fix that).  Last is currently broken for quotes
@@ -393,7 +396,7 @@ function! s:NextTextObject(motion, dir)
         let open = ''
         let close = ''
 
-        if c ==# "(" 
+        if c ==# "("
             let open = "("
             let close = ")"
         elseif c ==# "{"
@@ -456,10 +459,11 @@ endfunction
 " ----------------------------------------- "
 " File Type settings 			    		"
 " ----------------------------------------- "
+setlocal noet ts=4 sw=4 sts=4
 
 au BufNewFile,BufRead *.vim setlocal noet ts=2 sw=2 sts=2
-au BufNewFile,BufRead *.txt setlocal noet ts=4 sw=4 
-au BufNewFile,BufRead *.md setlocal noet ts=4 sw=4 
+au BufNewFile,BufRead *.txt setlocal noet ts=4 sw=4
+au BufNewFile,BufRead *.md setlocal noet ts=4 sw=4
 
 augroup filetypedetect
     au BufNewFile,BufRead .tmux.conf*,tmux.conf* setf tmux
@@ -511,8 +515,8 @@ com! JSONFormat %!python -m json.tool
 " ----------------------------------------- "
 
 " ==================== CtrlP ====================
-let g:ctrlp_cmd = 'CtrlPMRU'		
-let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
+let g:ctrlp_cmd = 'CtrlPMRU'
+"let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
 let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_max_height = 10		" maxiumum height of match window
@@ -522,6 +526,7 @@ let g:ctrlp_max_files=0  		" do not limit the number of searchable files
 let g:ctrlp_use_caching = 1
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+let g:ctrlp_follow_symslinks = 1
 
 func! MyPrtMappings()
     let g:ctrlp_prompt_mappings = {
@@ -549,7 +554,9 @@ let g:ctrlp_buftag_types = {
             \ 'rc'         : '--language-force=rust --rust-types=fTm'
             \ }
 
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 
+let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$'
 " get me a list of files in the current dir
 if has("gui_macvim")
     nmap <C-f> :CtrlPCurWD<cr>
@@ -560,7 +567,10 @@ endif
 " ==================== YouCompleteMe ====================
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_min_num_of_chars_for_completion = 1
-
+" make YCM compatible with UltiSnips (using supertab)
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:SuperTabDefaultCompletionType = '<C-n>'
 
 " ==================== ChooseWin ====================
 nmap  -  <Plug>(choosewin)
@@ -650,6 +660,9 @@ if !exists("g:UltiSnipsJumpBackwardTrigger")
     let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 endif
 
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
 au BufEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
 
@@ -665,8 +678,44 @@ function! g:NerdTreeFindToggle()
 endfunction
 
 " For toggling
-noremap <Leader>n :<C-u>call g:NerdTreeFindToggle()<cr> 
+noremap <Leader>n :<C-u>call g:NerdTreeFindToggle()<cr>
 
 " For refreshing current file and showing current dir
 noremap <Leader>j :NERDTreeFind<cr>
 " vim:ts=4:sw=4:et
+
+" =============== FZF ====================
+" This is the default extra key bindings
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+" Default fzf layout
+" - down / up / left / right
+let g:fzf_layout = { 'down': '~40%' }
+
+" In Neovim, you can set up fzf window using a Vim command
+let g:fzf_layout = { 'window': 'enew' }
+let g:fzf_layout = { 'window': '-tabnew' }
+
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" Enable per-command history.
+" CTRL-N and CTRL-P will be automatically bound to next-history and
+" previous-history instead of down and up. If you don't like the change,
+" explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
+let g:fzf_history_dir = '~/.fzf-history'
