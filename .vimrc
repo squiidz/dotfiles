@@ -4,27 +4,19 @@ set rtp+=~/.vim/bundle/Vundle.vim
 set shell=/bin/zsh
 call vundle#begin()
 
-"Plugin 'JazzCore/ctrlp-cmatcher'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'tpope/vim-rails'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'gmarik/Vundle.vim'
 Plugin 'rust-lang/rust.vim'
+Plugin 'kchmck/vim-coffee-script'
 Plugin 'tpope/vim-fugitive'
 Plugin 'Valloric/YouCompleteMe'
-Plugin 'git://git.wincent.com/command-t.git'
 Plugin 'fatih/vim-go'
-Plugin 'fatih/vim-nginx'
-Plugin 'mileszs/ack.vim'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'SirVer/ultisnips'
-Plugin 'Raimondi/delimitMate'
-Plugin 't9md/vim-choosewin'
 Plugin 'fatih/molokai'
-Plugin 'tomtom/tcomment_vim'
-Plugin 'majutsushi/tagbar'
-Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'ekalinin/Dockerfile.vim'
 Plugin 'cespare/vim-toml'
 Plugin 'bling/vim-airline'
@@ -52,6 +44,9 @@ set autowrite                   " Automatically save before :next, :make etc.
 set autoread                    " Automatically reread changed files without asking me anything
 set laststatus=2
 set fileformats=unix,dos,mac    " Prefer Unix over Windows over OS 9 formats
+set clipboard=unnamed
+
+au FileType ruby setl sw=2 sts=2 et
 
 " Airline Config
   let g:airline_theme='badwolf'
@@ -580,10 +575,6 @@ let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 let g:SuperTabDefaultCompletionType = '<C-n>'
 
-" ==================== ChooseWin ====================
-nmap  -  <Plug>(choosewin)
-
-
 " ==================== DelimitMate ====================
 let g:delimitMate_expand_cr = 1
 let g:delimitMate_expand_space = 1
@@ -599,25 +590,6 @@ vnoremap <leader>gb :Gblame<CR>
 " ==================== Airline ====================
 let g:airline_left_sep  = ' '
 let g:airline_right_sep = ' '
-
-
-" ==================== CommandT ====================
-let g:CommandTMaxHeight = 20
-let g:CommandTMaxFiles = 500000
-let g:CommandTMatchWindowReverse = 1
-let g:CommandTMaxCachedDirectories = 0
-let g:CommandTAcceptSelectionTabMap = '<CR>'
-let g:CommandTHighlightColor = 'Typedef'
-
-if has("gui_macvim")
-    macmenu &File.New\ Tab key=<nop>
-    " nnoremap <silent> <c-p> :CommandT /Users/fatih/Code/koding/<CR>
-    nmap <D-p> :CommandT /Users/fatih/Code/koding<CR>
-else
-    nmap <C-t> :CommandT /Users/fatih/Code/koding<cr>
-    imap <C-t> <esc>:CommandT /Users/fatih/Code/koding<cr>
-endif
-
 
 " ==================== Vim-go ====================
 let g:go_fmt_fail_silently = 1
@@ -691,39 +663,3 @@ noremap <Leader>n :<C-u>call g:NerdTreeFindToggle()<cr>
 " For refreshing current file and showing current dir
 noremap <Leader>j :NERDTreeFind<cr>
 " vim:ts=4:sw=4:et
-
-" =============== FZF ====================
-" This is the default extra key bindings
-let g:fzf_action = {
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-x': 'split',
-  \ 'ctrl-v': 'vsplit' }
-
-" Default fzf layout
-" - down / up / left / right
-let g:fzf_layout = { 'down': '~40%' }
-
-" In Neovim, you can set up fzf window using a Vim command
-let g:fzf_layout = { 'window': 'enew' }
-let g:fzf_layout = { 'window': '-tabnew' }
-
-" Customize fzf colors to match your color scheme
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-
-" Enable per-command history.
-" CTRL-N and CTRL-P will be automatically bound to next-history and
-" previous-history instead of down and up. If you don't like the change,
-" explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
-let g:fzf_history_dir = '~/.fzf-history'
