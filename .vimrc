@@ -167,10 +167,6 @@ else
     set t_Co=256
 endif
 
-" Stop completion with enter, in addition to default ctrl+y
-imap <expr> <CR> pumvisible() ? "\<c-y>" : "<Plug>delimitMateCR"
-
-
 " This comes first, because we have mappings that depend on leader
 " With a map leader it's possible to do extra key combinations
 " i.e: <leader>w saves the current file
