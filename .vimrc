@@ -1,10 +1,12 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
+set rtp+=/usr/local/opt/fzf
 set shell=/bin/zsh
 call vundle#begin()
 
-Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'junegunn/fzf.vim'
+" Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'tpope/vim-rails'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'gmarik/Vundle.vim'
@@ -45,6 +47,14 @@ set autoread                    " Automatically reread changed files without ask
 set laststatus=2
 set fileformats=unix,dos,mac    " Prefer Unix over Windows over OS 9 formats
 set clipboard=unnamed
+
+" Clear the current search highlight by pressing Esc
+nnoremap <esc><esc> :noh<CR>
+nnoremap <C-p> :FZF<CR>
+
+" Open NERDTree with vim by default
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTreeToggle | endif
 
 au FileType ruby setl sw=2 sts=2 et
 
@@ -111,16 +121,57 @@ if has("gui_macvim")
     " let g:ctrlp_map = '<D-p>'
 
     " Open goto symbol on current buffer
-    nmap <D-r> :MyCtrlPTag<cr>
-    imap <D-r> <esc>:MyCtrlPTag<cr>
+"    nmap <D-r> :MyCtrlPTag<cr>
+"    imap <D-r> <esc>:MyCtrlPTag<cr>
 
     " Open goto symbol on all buffers
-    nmap <D-R> :CtrlPBufTagAll<cr>
-    imap <D-R> <esc>:CtrlPBufTagAll<cr>
+
+"    imap <D-R> <esc>:CtrlPBufTagAll<cr>
 
     " Open goto file
-    nmap <D-t> :CtrlP<cr>
-    imap <D-t> <esc>:CtrlP<cr>
+"    nmap <D-t> :CtrlP<cr>
+"   imap <D-t> <esc>:CtrlP<cr>
+
+
+    " FZF Config
+    " This is the default extra key bindings
+     let g:fzf_action = {
+       \ 'ctrl-t': 'tab split',
+         \ 'ctrl-x': 'split',
+           \ 'ctrl-v': 'vsplit' }
+    
+           " Default fzf layout
+           " - down / up / left / right
+           let g:fzf_layout = { 'down': '~40%' }
+    
+           " In Neovim, you can set up fzf window using a Vim command
+           let g:fzf_layout = { 'window': 'enew' }
+           let g:fzf_layout = { 'window': '-tabnew' }
+    
+           " Customize fzf colors to match your color scheme
+           let g:fzf_colors =
+           \ { 'fg':      ['fg', 'Normal'],
+             \ 'bg':      ['bg', 'Normal'],
+               \ 'hl':      ['fg', 'Comment'],
+                 \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+                   \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+                     \ 'hl+':     ['fg', 'Statement'],
+                       \ 'info':    ['fg', 'PreProc'],
+                         \ 'prompt':  ['fg', 'Conditional'],
+                           \ 'pointer': ['fg', 'Exception'],
+                             \ 'marker':  ['fg', 'Keyword'],
+                               \ 'spinner': ['fg', 'Label'],
+                                 \ 'header':  ['fg', 'Comment'] }
+    
+                                 " Enable per-command history.
+                                 " CTRL-N and CTRL-P will be automatically
+                                 bound to next-history and
+                                 " previous-history instead of down and up.
+                                 If you don't like the change,
+                                 " explicitly bind the keys to down and up in
+                                 your $FZF_DEFAULT_OPTS.
+                                 let g:fzf_history_dir =
+                                 '~/.local/share/fzf-history'
 
     " Comment lines with cmd+/
     map <D-/> :TComment<cr>
