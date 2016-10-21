@@ -107,8 +107,9 @@ set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
    " Default fzf layout
    " - down / up / left / right
    let g:fzf_layout = { 'down': '~30%' }
-   
-    nnoremap <C-g> :call fzf#run({'source': 'git ls-files', 'sink': 'e', 'down': '20%'})<CR>
+    
+    let git_root_ls = 'git --git-dir "`git rev-parse --git-dir`" -C "`git config core.worktree || pwd`" ls-files'   
+    nnoremap <C-g> :call fzf#run({'source': git_root_ls, 'sink': 'e', 'down': '20%'})<CR>
     nnoremap <C-p> :FZF<CR>
 
    if executable('ag')
