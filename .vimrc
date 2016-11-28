@@ -1,702 +1,300 @@
-set nocompatible              " be iMproved, required
-filetype off                  " required
-set rtp+=~/.vim/bundle/Vundle.vim
-set rtp+=/usr/local/opt/fzf
-set shell=/bin/zsh
-call vundle#begin()
+" vim: set ft=vim:
+set nocompatible
+" PLUGINS
+" ==============================================================
 
-Plugin 'junegunn/fzf.vim'
-" Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'tpope/vim-rails'
-Plugin 'vim-ruby/vim-ruby'
-Plugin 'gmarik/Vundle.vim'
-Plugin 'rust-lang/rust.vim'
-Plugin 'kchmck/vim-coffee-script'
-Plugin 'tpope/vim-fugitive'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'fatih/vim-go'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'scrooloose/nerdtree'
-Plugin 'SirVer/ultisnips'
-Plugin 'fatih/molokai'
-Plugin 'ekalinin/Dockerfile.vim'
-Plugin 'cespare/vim-toml'
-Plugin 'bling/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
+" Autoinstall vim-plug
+" {{{
+if empty(glob('~/.nvim/autoload/plug.vim'))
+  silent !curl -fLo ~/.nvim/autoload/plug.vim --create-dirs
+      \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall
+endif
+" }}}
+call plug#begin('~/.nvim/plugged')
 
-call vundle#end()            " required
-filetype plugin indent on    " required
+" tpope!
+if !has("nvim")
+  Plug 'tpope/vim-sensible'
+endif
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-git'
+Plug 'tpope/vim-markdown'
+Plug 'tpope/vim-ragtag'
+Plug 'fatih/vim-go'
+Plug 'rust-lang/rust.vim'
+Plug 'racer-rust/vim-racer'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-commentary'
 
+" Navigation
+Plug 'scrooloose/nerdtree'
+" {{{
+  let g:NERDTreeMinimalUI = 1
+  let g:NERDTreeDirArrows = 1
+  let g:NERDTreeChDirMode = 2
+  let g:NERDTreeAutoDeleteBuffer = 1
+
+  map <F6> :NERDTreeToggle<CR>
+  map <F5> :NERDTreeFind<CR>
+  autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTreeToggle | endif
+" }}}
+
+" Rust Racer autocomplete
+set hidden
+let g:racer_cmd = "~/.cargo/bin/racer"
+let $RUST_SRC_PATH="~/src/rustc-nightly/src/"
+let g:racer_experimental_completer = 1
+
+
+" Autocomplete/fuzzy search/ack
+" Plug 'Valloric/YouCompleteMe'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" {{{
+  let g:deoplete#enable_at_startup = 1
+  " let g:deoplete#omni#functions = {}
+  " let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
+" }}}
+"Plug 'fishbullet/deoplete-ruby'
+
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+" {{{
+  let $FZF_DEFAULT_OPTS .= ' --inline-info'
+" }}}
+Plug 'junegunn/fzf.vim'
+" {{{
+  nnoremap <silent> <Leader><Leader> :Files<CR>
+  nnoremap <silent> <Leader>b :Buffers<CR>
+  nnoremap <silent> <Leader>o :BTags<CR>
+  nnoremap <silent> <Leader>ag :Ag <C-R><C-W><C-R>
+  imap <c-x><c-k> <plug>(fzf-complete-word)
+  imap <c-x><c-f> <plug>(fzf-complete-path)
+  imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+  imap <c-x><c-l> <plug>(fzf-complete-line)
+" }}}
+
+Plug 'mileszs/ack.vim'
+" {{{
+  let g:ackprg = 'ag --nogroup --nocolor --column'
+" }}}
+
+" Languages/editing
+Plug 'vim-ruby/vim-ruby'
+Plug 'bingaman/vim-sparkup'
+" {{{
+  let g:sparkupArgs = '--no-last-newline --expand-divs'
+" }}}
+Plug 'kchmck/vim-coffee-script'
+Plug 'JSON.vim'
+Plug 'robbles/logstash.vim'
+Plug 'leafgarland/typescript-vim'
+Plug 'ekalinin/Dockerfile.vim'
+
+" Make/link
+Plug 'neomake/neomake'
+" {{{
+  autocmd! BufWritePost * Neomake
+  let g:neomake_open_list=2
+" }}}
+
+" objects
+Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-indent'
+Plug 'nelstrom/vim-textobj-rubyblock'
+
+" tests
+Plug 'junegunn/vim-emoji'
+Plug 'kassio/neoterm'
+" {{{
+  let g:neoterm_run_tests_bg = 1
+  let g:neoterm_raise_when_tests_fail = 1
+  "let g:neoterm_close_when_tests_succeed = 1
+  let g:neoterm_rspec_lib_cmd = 'zeus rspec'
+
+  nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
+  nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
+
+  " toggle terminal
+  nnoremap <silent> ,tt :Ttoggle<cr>
+  " hide/close terminal
+  nnoremap <silent> ,th :call neoterm#close()<cr>
+  " clear terminal
+  nnoremap <silent> ,tl :call neoterm#clear()<cr>
+  " kills the current job (send a <c-c>)
+  nnoremap <silent> ,tc :call neoterm#kill()<cr>
+" }}}
+
+" misc
+Plug 'kshenoy/vim-signature'
+Plug 'itchyny/lightline.vim'
+" {{{
+  let g:lightline = {
+    \ 'active': {
+    \   'right': [ [ 'lineinfo' ], [ 'percent' ],
+    \              [ 'neoterm', 'fileformat', 'fileencoding', 'filetype' ] ]
+    \ },
+    \ 'component_function': {
+    \   'neoterm': 'LightlineNeoterm'
+    \ },
+    \ 'separator': { 'left': '', 'right': '' },
+    \ 'subseparator': { 'left': '', 'right': '' }
+    \ }
+  set noshowmode " Remove duplicate information
+
+  function! LightlineNeoterm()
+    return g:neoterm_statusline
+  endfunction
+" }}}
+
+Plug 'airblade/vim-gitgutter'
+" {{{
+  let g:gitgutter_map_keys = 0
+  let g:gitgutter_max_signs = 200
+  let g:gitgutter_realtime = 0
+  let g:gitgutter_eager = 0
+" }}}
 "
-" Settings
-"
-set noerrorbells                " No beeps
-set number                      " Show line numbers
-set backspace=indent,eol,start  " Makes backspace key more powerful.
-set showcmd                     " Show me what I'm typing
-set showmode                    " Show current mode.
-set relativenumber
-set number
-set noswapfile                  " Don't use swapfile
-set nobackup            	    " Don't create annoying backup files
-set splitright                  " Split vertical windows right to the current windows
-set splitbelow                  " Split horizontal windows below to the current windows
-set encoding=utf-8              " Set default encoding to UTF-8
-set autowrite                   " Automatically save before :next, :make etc.
-set autoread                    " Automatically reread changed files without asking me anything
-set laststatus=2
-set fileformats=unix,dos,mac    " Prefer Unix over Windows over OS 9 formats
-"http://stackoverflow.com/questions/20186975/vim-mac-how-to-copy-to-clipboard-without-pbcopy
-set clipboard^=unnamed
-set clipboard^=unnamedplus
+Plug 'ludovicchabant/vim-gutentags'
+
+Plug 'junegunn/limelight.vim'
+" {{{
+  let g:limelight_default_coefficient = 0.7
+  nmap <silent> gl :Limelight!!<CR>
+" }}}
+
+Plug 'frankier/neovim-colors-solarized-truecolor-only'
+"Plug 'fatih/molokai'
+
+call plug#end()
+
+" POST PLUGIN
+" ==============================================================
+
+" NEOTERM
+" Dependency on vim-emoji, needs to be loaded
+let g:neoterm_test_status = {
+  \ 'running': emoji#for('running'),
+  \ 'success': emoji#for('green_heart'),
+  \ 'failed': emoji#for('broken_heart')
+  \ }
+
+
+" General settings
+" ==============================================================
+set clipboard=unnamed,unnamedplus
+
+set title
+set visualbell
+set number          " show line numbers
+set relativenumber  " use relative lines numbering by default
+set hidden          " hide buffers instead of closing
+set lazyredraw      " speed up on large files
+set laststatus=2    " Show the status line all the time
+set showcmd         " Display incomplete commands.
+set undolevels=5000 " max undo levels
+set nobackup
+set nowritebackup
+set noswapfile
+set nowrap                        " Turn off line wrapping.
+set scrolloff=3                   " Show 3 lines of context around the cursor.
+
+" Split below and right
+set splitbelow
+set splitright
+
+" Show tabs, trailing whitespaces, extends and precedes
+set list
+set listchars=tab:>-,trail:·,extends:>,precedes:<,nbsp:+
+
+" INDENTATION
+" ==============================================================
+set expandtab     " replace <Tab> with spaces
+set tabstop=2     " number of spaces that a <Tab> in the file counts for
+set softtabstop=2 " remove <Tab> symbols as it was spaces
+set shiftwidth=2  " indent size for << and >>
+set shiftround    " round indent to multiple of 'shiftwidth' (for << and >>)
+
+
+" SEARCH
+" ==============================================================
+set incsearch                     " Highlight matches as you type.
+set hlsearch                      " Highlight matches.
+set ignorecase                    " Case-insensitive searching.
+set smartcase                     " But case-sensitive if expression contains a capital letter.
+
+
+" FOLDING
+" ==============================================================
+" Set fold method -- currently 'manual' for performance reasons (dramatically
+" accelerates opening files like routes.rb)
+set foldmethod=manual
+" Enable a fold column
+set foldcolumn=4
+" Disable folding by default
+set nofoldenable
+" Enable folding by <Leader>f
+noremap <Leader>f :setlocal foldmethod=syntax foldcolumn=4<CR>
+
+
+" COLORSCHEME
+" ==============================================================
+set termguicolors
+syntax enable
+set background=dark
+"let g:molokai_original=1
+colorscheme solarized
+let g:solarized_termcolors=256
+"set t_Co=256
+call togglebg#map("<F4>")
+
+" MISC
+" ==============================================================
+set cursorline
+set colorcolumn=80
+
+" CTags - refresh tags
+map <Leader>tt :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
 
 " Clear the current search highlight by pressing Esc
-nnoremap <esc><esc> :noh<CR>
+nnoremap <silent> <esc><esc> :noh<CR><esc>
 
-" Open NERDTree with vim by default
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTreeToggle | endif
-
-au FileType ruby setl sw=2 sts=2 et
-
-" Airline Config
-  let g:airline_theme='badwolf'
-  if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-  endif
-
-  " unicode symbols
-  let g:airline_left_sep = '»'
-  let g:airline_left_sep = '▶'
-  let g:airline_right_sep = '«'
-  let g:airline_right_sep = '◀'
-  let g:airline_symbols.linenr = '␊'
-  let g:airline_symbols.linenr = '␤'
-  let g:airline_symbols.linenr = '¶'
-  let g:airline_symbols.branch = '⎇'
-  let g:airline_symbols.paste = 'ρ'
-  let g:airline_symbols.paste = 'Þ'
-  let g:airline_symbols.paste = '∥'
-  let g:airline_symbols.whitespace = 'Ξ'
-
-set noshowmatch                 " Do not show matching brackets by flickering
-set nocursorcolumn
-set lazyredraw          	    " Wait to redraw "
-set incsearch                   " Shows the match while typing
-set hlsearch                    " Highlight found searches
-set ignorecase                  " Search case insensitive...
-set smartcase                   " ... but not when search pattern contains upper case characters
-set ttyfast
-
-" speed up syntax highlighting
-set nocursorcolumn
-set nocursorline
-syntax sync minlines=256
-set synmaxcol=128
-
-
-set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
-
-" FZF Config
-" This is the default extra key bindings
-   let g:fzf_action = {
-     \ 'ctrl-t': 'tab split',
-     \ 'ctrl-x': 'split',
-     \ 'ctrl-v': 'vsplit' }
-
-   " Default fzf layout
-   " - down / up / left / right
-   let g:fzf_layout = { 'down': '~30%' }
-    
-    let git_root_ls = 'git --git-dir "`git rev-parse --git-dir`" -C "`git config core.worktree || pwd`" ls-files'   
-    nnoremap <C-g> :call fzf#run({'source': git_root_ls, 'sink': 'e', 'down': '20%'})<CR>
-    nnoremap <C-p> :FZF<CR>
-
-   if executable('ag')
-         let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+"jump to last cursor position when opening a file
+"dont do it when writing a commit log entry
+autocmd BufReadPost * call SetCursorPosition()
+function! SetCursorPosition()
+  if &filetype !~ 'commit\c'
+    if line("'\"") > 0 && line("'\"") <= line("$")
+      exe "normal! g`\""
+      normal! zz
     endif
-   " Customize fzf colors to match your color scheme
-   let g:fzf_colors =
-   \ { 'fg':      ['fg', 'Normal'],
-   \ 'bg':      ['bg', 'Normal'],
-   \ 'hl':      ['fg', 'Comment'],
-   \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-   \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-   \ 'hl+':     ['fg', 'Statement'],
-   \ 'info':    ['fg', 'PreProc'],
-   \ 'prompt':  ['fg', 'Conditional'],
-   \ 'pointer': ['fg', 'Exception'],
-   \ 'marker':  ['fg', 'Keyword'],
-   \ 'spinner': ['fg', 'Label'],
-   \ 'header':  ['fg', 'Comment'] }
+  end
+endfunction
 
-   let g:fzf_history_dir = '~/.local/share/fzf-history'
+" Strip trailing whitespace
+function! <SID>StripTrailingWhitespaces()
+  " Preparation: save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  " Do the business:
+  %s/\s\+$//e
+  " Clean up: restore previous search history, and cursor position
+  let @/=_s
+  call cursor(l, c)
+endfunction
+autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
 
-if has("gui_macvim")
-    " No toolbars, menu or scrollbars in the GUI
-    set guifont=Source\ Code\ Pro:h13
-    set clipboard+=unnamed
-    set vb t_vb=
-    set guioptions-=m  "no menu
-    set guioptions-=T  "no toolbar
-    set guioptions-=l
-    set guioptions-=L
-    set guioptions-=r  "no scrollbar
-    set guioptions-=R
 
-    let macvim_skip_colorscheme=1
-    let g:molokai_original=1
-    colorscheme molokai
-    highlight SignColumn guibg=#272822
+" NVIM
+" ==============================================================
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
-    " Open ctrlp with cmd+p
-   let g:ctrlp_map = '<D-p>'
-
-    " Open goto symbol on current buffer
-    nmap <D-r> :MyCtrlPTag<cr>
-    imap <D-r> <esc>:MyCtrlPTag<cr>
-
-    " Open goto symbol on all buffers
-    imap <D-R> <esc>:CtrlPBufTagAll<cr>
-
-    " Open goto file
-    nmap <D-t> :CtrlP<cr>
-    imap <D-t> <esc>:CtrlP<cr>
-
-    " Comment lines with cmd+/
-    map <D-/> :TComment<cr>
-    vmap <D-/> :TComment<cr>gv
-
-    " Indent lines with cmd+[ and cmd+]
-    nmap <D-]> >>
-    nmap <D-[> <<
-    vmap <D-[> <gv
-    vmap <D-]> >gv
-
-    " This mapping makes Ctrl-Tab switch between tabs.
-    " Ctrl-Shift-Tab goes the other way.
-    noremap <C-Tab> :tabnext<CR>
-    noremap <C-S-Tab> :tabprev<CR>
-
-    " switch between tabs with cmd+1, cmd+2,..."
-    map <D-1> 1gt
-    map <D-2> 2gt
-    map <D-3> 3gt
-    map <D-4> 4gt
-    map <D-5> 5gt
-    map <D-6> 6gt
-    map <D-7> 7gt
-    map <D-8> 8gt
-    map <D-9> 9gt
-
-    " until we have default MacVim shortcuts this is the only way to use it in
-    " insert mode
-    imap <D-1> <esc>1gt
-    imap <D-2> <esc>2gt
-    imap <D-3> <esc>3gt
-    imap <D-4> <esc>4gt
-    imap <D-5> <esc>5gt
-    imap <D-6> <esc>6gt
-    imap <D-7> <esc>7gt
-    imap <D-8> <esc>8gt
-    imap <D-9> <esc>9gt
-else
-    syntax enable
-    " set background=dark
-    let g:molokai_original=1
-    colorscheme molokai
-    set t_Co=256
+if filereadable(glob("~/.nvimrc.local"))
+  source ~/.nvimrc.local
 endif
-
-" This comes first, because we have mappings that depend on leader
-" With a map leader it's possible to do extra key combinations
-" i.e: <leader>w saves the current file
-let mapleader = ","
-let g:mapleader = ","
-
-" This trigger takes advantage of the fact that the quickfix window can be
-" easily distinguished by its file-type, qf. The wincmd J command is
-" equivalent to the Ctrl+W, Shift+J shortcut telling Vim to move a window to
-" the very bottom (see :help :wincmd and :help ^WJ).
-autocmd FileType qf wincmd J
-
-"Dont show me any output when I build something
-"Because I am using quickfix for errors
-nmap <leader>m :make<CR><enter>
-
-" Some useful quickfix shortcuts
-":cc      see the current error
-":cn      next error
-":cp      previous error
-":clist   list all errors
-map <C-n> :cn<CR>
-map <C-m> :cp<CR>
-
-" Close quickfix easily
-nnoremap <leader>a :cclose<CR>
-
-" Remove search highlight
-nnoremap <leader><space> :nohlsearch<CR>
-
-" Better split switching
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-" Fast saving
-nmap <leader>w :w!<cr>
-
-
-" http://stackoverflow.com/questions/4298910/vim-close-buffer-but-not-split-window
-function! CloseSplitOrDeleteBuffer()
-  let curNr = winnr()
-  let curBuf = bufnr('%')
-  wincmd w                    " try to move on next split
-  if winnr() == curNr         " there is no split
-    exe 'bdelete'
-  elseif curBuf != bufnr('%') " there is split with another buffer
-    wincmd W                  " move back
-    exe 'bdelete'
-  else                        " there is split with same buffer"
-    wincmd W
-    wincmd c
-  endif
-endfunction
-
-nnoremap <leader>q :call CloseSplitOrDeleteBuffer()<CR>
-
-
-" Center the screen
-nnoremap <space> zz
-
-" Move up and down on splitted lines (on small width screens)
-map <Up> gk
-map <Down> gj
-map k gk
-map j gj
-
-" Just go out in insert mode
-imap jk <ESC>l
-
-" Select search pattern howewever do not jump to the next one
-nnoremap <leader>f *N
-
-nnoremap <F6> :setlocal spell! spell?<CR>
-
-
-" Select search pattern howewever do not jump to the next one
-nnoremap <leader>c :TComment<cr>
-
-" Search mappings: These will make it so that going to the next one in a
-" search will center on the line it's found in.
-nnoremap n nzzzv
-nnoremap N Nzzzv
-
-"nnoremap <leader>. :lcd %:p:h<CR>
-autocmd BufEnter * silent! lcd %:p:h
-
-" trim all whitespaces away
-nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
-
-" Act like D and C
-nnoremap Y y$
-
-" Do not show stupid q: window
-map q: :q
-
-"Reindent whoel file
-map <F7> mzgg=G`z<CR>
-
-
-" ========== Steve Losh hacks ==========="
-
-" Don't move on *
-" I'd use a function for this but Vim clobbers the last search when you're in
-" a function so fuck it, practicality beats purity.
-nnoremap <silent> * :let stay_star_view = winsaveview()<cr>*:call winrestview(stay_star_view)<cr>
-
-" iTerm2 is currently slow as balls at rendering the nice unicode lines, so for
-" now I'll just use ASCII pipes.  They're ugly but at least I won't want to kill
-" myself when trying to move around a file.
-set fillchars=diff:⣿,vert:│
-set fillchars=diff:⣿,vert:\|
-
-" Time out on key codes but not mappings.
-" Basically this makes terminal Vim work sanely.
-set notimeout
-set ttimeout
-set ttimeoutlen=10
-
-" Better Completion
-set complete=.,w,b,u,t
-set completeopt=longest,menuone
-
-" Diffoff
-nnoremap <leader>D :diffoff!<cr>
-
-" Resize splits when the window is resized
-au VimResized * :wincmd =
-
-" }}}
-" Visual Mode */# from Scrooloose {{{
-
-function! s:VSetSearch()
-  let temp = @@
-  norm! gvy
-  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
-  let @@ = temp
-endfunction
-
-vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
-vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
-
-" }}}
-" Next and Last {{{
-"
-" Motion for "next/last object".  "Last" here means "previous", not "final".
-" Unfortunately the "p" motion was already taken for paragraphs.
-"
-" Next acts on the next object of the given type, last acts on the previous
-" object of the given type.  These don't necessarily have to be in the current
-" line.
-"
-" Currently works for (, [, {, and their shortcuts b, r, B.
-"
-" Next kind of works for ' and " as long as there are no escaped versions of
-" them in the string (TODO: fix that).  Last is currently broken for quotes
-" (TODO: fix that).
-"
-" Some examples (C marks cursor positions, V means visually selected):
-"
-" din'  -> delete in next single quotes                foo = bar('spam')
-"                                                      C
-"                                                      foo = bar('')
-"                                                                C
-"
-" canb  -> change around next parens                   foo = bar('spam')
-"                                                      C
-"                                                      foo = bar
-"                                                               C
-"
-" vin"  -> select inside next double quotes            print "hello ", name
-"                                                       C
-"                                                      print "hello ", name
-"                                                             VVVVVV
-
-onoremap an :<c-u>call <SID>NextTextObject('a', '/')<cr>
-xnoremap an :<c-u>call <SID>NextTextObject('a', '/')<cr>
-onoremap in :<c-u>call <SID>NextTextObject('i', '/')<cr>
-xnoremap in :<c-u>call <SID>NextTextObject('i', '/')<cr>
-
-onoremap al :<c-u>call <SID>NextTextObject('a', '?')<cr>
-xnoremap al :<c-u>call <SID>NextTextObject('a', '?')<cr>
-onoremap il :<c-u>call <SID>NextTextObject('i', '?')<cr>
-xnoremap il :<c-u>call <SID>NextTextObject('i', '?')<cr>
-
-
-function! s:NextTextObject(motion, dir)
-    let c = nr2char(getchar())
-    let d = ''
-
-    if c ==# "b" || c ==# "(" || c ==# ")"
-        let c = "("
-    elseif c ==# "B" || c ==# "{" || c ==# "}"
-        let c = "{"
-    elseif c ==# "r" || c ==# "[" || c ==# "]"
-        let c = "["
-    elseif c ==# "'"
-        let c = "'"
-    elseif c ==# '"'
-        let c = '"'
-    else
-        return
-    endif
-
-    " Find the next opening-whatever.
-    execute "normal! " . a:dir . c . "\<cr>"
-
-    if a:motion ==# 'a'
-        " If we're doing an 'around' method, we just need to select around it
-        " and we can bail out to Vim.
-        execute "normal! va" . c
-    else
-        " Otherwise we're looking at an 'inside' motion.  Unfortunately these
-        " get tricky when you're dealing with an empty set of delimiters because
-        " Vim does the wrong thing when you say vi(.
-
-        let open = ''
-        let close = ''
-
-        if c ==# "("
-            let open = "("
-            let close = ")"
-        elseif c ==# "{"
-            let open = "{"
-            let close = "}"
-        elseif c ==# "["
-            let open = "\\["
-            let close = "\\]"
-        elseif c ==# "'"
-            let open = "'"
-            let close = "'"
-        elseif c ==# '"'
-            let open = '"'
-            let close = '"'
-        endif
-
-        " We'll start at the current delimiter.
-        let start_pos = getpos('.')
-        let start_l = start_pos[1]
-        let start_c = start_pos[2]
-
-        " Then we'll find it's matching end delimiter.
-        if c ==# "'" || c ==# '"'
-            " searchpairpos() doesn't work for quotes, because fuck me.
-            let end_pos = searchpos(open)
-        else
-            let end_pos = searchpairpos(open, '', close)
-        endif
-
-        let end_l = end_pos[0]
-        let end_c = end_pos[1]
-
-        call setpos('.', start_pos)
-
-        if start_l == end_l && start_c == (end_c - 1)
-            " We're in an empty set of delimiters.  We'll append an "x"
-            " character and select that so most Vim commands will do something
-            " sane.  v is gonna be weird, and so is y.  Oh well.
-            execute "normal! ax\<esc>\<left>"
-            execute "normal! vi" . c
-        elseif start_l == end_l && start_c == (end_c - 2)
-            " We're on a set of delimiters that contain a single, non-newline
-            " character.  We can just select that and we're done.
-            execute "normal! vi" . c
-        else
-            " Otherwise these delimiters contain something.  But we're still not
-            " sure Vim's gonna work, because if they contain nothing but
-            " newlines Vim still does the wrong thing.  So we'll manually select
-            " the guts ourselves.
-            let whichwrap = &whichwrap
-            set whichwrap+=h,l
-
-            execute "normal! va" . c . "hol"
-
-            let &whichwrap = whichwrap
-        endif
-    endif
-endfunction
-
-" ----------------------------------------- "
-" File Type settings 			    		"
-" ----------------------------------------- "
-setlocal noet ts=4 sw=4 sts=4
-
-au BufNewFile,BufRead *.vim setlocal noet ts=2 sw=2 sts=2
-au BufNewFile,BufRead *.txt setlocal noet ts=4 sw=4
-au BufNewFile,BufRead *.md setlocal noet ts=4 sw=4
-
-augroup filetypedetect
-    au BufNewFile,BufRead .tmux.conf*,tmux.conf* setf tmux
-    au BufNewFile,BufRead .nginx.conf*,nginx.conf* setf nginx
-augroup END
-
-au FileType nginx setlocal noet ts=4 sw=4 sts=4
-
-" Go settings
-au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
-" au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
-
-" coffeescript settings
-autocmd BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
-
-" scala settings
-autocmd BufNewFile,BufReadPost *.scala setl shiftwidth=2 expandtab
-
-" lua settings
-autocmd BufNewFile,BufRead *.lua setlocal noet ts=4 sw=4 sts=4
-
-
-" Wildmenu completion {{{
-set wildmenu
-" set wildmode=list:longest
-set wildmode=list:full
-
-set wildignore+=.hg,.git,.svn                    " Version control
-set wildignore+=*.aux,*.out,*.toc                " LaTeX intermediate files
-set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg   " binary images
-set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest " compiled object files
-set wildignore+=*.spl                            " compiled spelling word lists
-set wildignore+=*.sw?                            " Vim swap files
-set wildignore+=*.DS_Store                       " OSX bullshit
-set wildignore+=*.luac                           " Lua byte code
-set wildignore+=migrations                       " Django migrations
-set wildignore+=go/pkg                       " Go static files
-set wildignore+=go/bin                       " Go bin files
-set wildignore+=go/bin-vagrant               " Go bin-vagrant files
-set wildignore+=*.pyc                            " Python byte code
-set wildignore+=*.orig                           " Merge resolution files
-
-" Prettify json
-com! JSONFormat %!python -m json.tool
-
-
-" ----------------------------------------- "
-" Plugin configs 			    			"
-" ----------------------------------------- "
-
-" ==================== CtrlP ====================
-let g:ctrlp_cmd = 'CtrlP'
-"let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
-let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_max_height = 10		" maxiumum height of match window
-let g:ctrlp_switch_buffer = 'et'	" jump to a file if it's open already
-let g:ctrlp_mruf_max=450 		" number of recently opened files
-let g:ctrlp_max_files=0  		" do not limit the number of searchable files
-let g:ctrlp_use_caching = 1
-let g:ctrlp_clear_cache_on_exit = 0
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-let g:ctrlp_follow_symslinks = 1
-
-if exists("g:ctrlp_user_command")
-	  unlet g:ctrlp_user_command
-  endif
-  set wildignore+=*\\vendor\\**
-
-func! MyPrtMappings()
-    let g:ctrlp_prompt_mappings = {
-                \ 'AcceptSelection("e")': ['<c-t>'],
-                \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
-                \ }
-endfunc
-
-func! MyCtrlPTag()
-    let g:ctrlp_prompt_mappings = {
-                \ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
-                \ 'AcceptSelection("t")': ['<c-t>'],
-                \ }
-    CtrlPBufTag
-endfunc
-
-let g:ctrlp_buffer_func = { 'exit': 'MyPrtMappings' }
-com! MyCtrlPTag call MyCtrlPTag()
-
-let g:ctrlp_buftag_types = {
-            \ 'go'     	   : '--language-force=go --golang-types=ftv',
-            \ 'coffee'     : '--language-force=coffee --coffee-types=cmfvf',
-            \ 'markdown'   : '--language-force=markdown --markdown-types=hik',
-            \ 'objc'       : '--language-force=objc --objc-types=mpci',
-            \ 'rc'         : '--language-force=rust --rust-types=fTm'
-            \ }
-
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
-
-let g:ctrlp_custom_ignore = {
-			\'dir': '\v[\/](\.git|node_modules|\.sass-cache|bower_components|build)$',
-\ }
-
-" get me a list of files in the current dir
-if has("gui_macvim")
-    nmap <C-f> :CtrlPCurWD<cr>
-    imap <C-f> <esc>:CtrlPCurWD<cr>
-endif
-
-
-" ==================== YouCompleteMe ====================
-let g:ycm_autoclose_preview_window_after_completion = 1
-let g:ycm_min_num_of_chars_for_completion = 1
-" make YCM compatible with UltiSnips (using supertab)
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-let g:SuperTabDefaultCompletionType = '<C-n>'
-
-" ==================== DelimitMate ====================
-let g:delimitMate_expand_cr = 1
-let g:delimitMate_expand_space = 1
-
-
-" ==================== Fugitive ====================
-nnoremap <leader>ga :Git add %:p<CR><CR>
-nnoremap <leader>gs :Gstatus<CR>
-nnoremap <leader>gb :Gblame<CR>
-vnoremap <leader>gb :Gblame<CR>
-
-
-" ==================== Airline ====================
-let g:airline_left_sep  = ' '
-let g:airline_right_sep = ' '
-
-" ==================== Vim-go ====================
-let g:go_fmt_fail_silently = 1
-let g:go_fmt_command = "gofmt"
-
-
-au FileType go nmap gd <Plug>(go-def)
-au FileType go nmap <Leader>s <Plug>(go-def-split)
-au FileType go nmap <Leader>v <Plug>(go-def-vertical)
-au FileType go nmap <Leader>t <Plug>(go-def-tab)
-
-au FileType go nmap <Leader>i <Plug>(go-info)
-
-au FileType go nmap  <leader>r  <Plug>(go-run)
-au FileType go nmap  <leader>b  <Plug>(go-build)
-
-au FileType go nmap <Leader>d <Plug>(go-doc)
-
-" ==================== UltiSnips ====================
-function! g:UltiSnips_Complete()
-    call UltiSnips#ExpandSnippetOrJump()
-    if g:ulti_expand_or_jump_res == 0
-        if pumvisible()
-            return "\<C-N>"
-        else
-            return "\<TAB>"
-        endif
-    endif
-
-    return ""
-endfunction
-
-function! g:UltiSnips_Reverse()
-    call UltiSnips#JumpBackwards()
-    if g:ulti_jump_backwards_res == 0
-        return "\<C-P>"
-    endif
-
-    return ""
-endfunction
-
-
-if !exists("g:UltiSnipsJumpForwardTrigger")
-    let g:UltiSnipsJumpForwardTrigger = "<tab>"
-endif
-
-if !exists("g:UltiSnipsJumpBackwardTrigger")
-    let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-endif
-
-let g:UltiSnipsExpandTrigger = "<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
-au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-au BufEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
-
-" ==================== NerdTree ====================
-" Open nerdtree in current dir, write our own custom function because
-" NerdTreeToggle just sucks and doesn't work for buffers
-function! g:NerdTreeFindToggle()
-    if nerdtree#isTreeOpen()
-        exec 'NERDTreeClose'
-    else
-        exec 'NERDTreeFind'
-    endif
-endfunction
-
-" For toggling
-noremap <Leader>n :<C-u>call g:NerdTreeFindToggle()<cr>
-
-" For refreshing current file and showing current dir
-noremap <Leader>j :NERDTreeFind<cr>
-" vim:ts=4:sw=4:et
