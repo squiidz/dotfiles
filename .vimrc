@@ -33,6 +33,8 @@ Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
 
+" Language setting
+" set ruby st=2
 " Navigation
 Plug 'scrooloose/nerdtree'
 " {{{
@@ -47,21 +49,21 @@ Plug 'scrooloose/nerdtree'
 " }}}
 
 " Rust Racer autocomplete
-set hidden
+"set hidden
 let g:racer_cmd = "~/.cargo/bin/racer"
 let $RUST_SRC_PATH="~/src/rustc-nightly/src/"
 let g:racer_experimental_completer = 1
 
 
 " Autocomplete/fuzzy search/ack
-" Plug 'Valloric/YouCompleteMe'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+ Plug 'Valloric/YouCompleteMe'
+ "Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " {{{
-  let g:deoplete#enable_at_startup = 1
-  " let g:deoplete#omni#functions = {}
-  " let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
+"   let g:deoplete#enable_at_startup = 1
+"   let g:deoplete#omni#functions = {}
+"   let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
 " }}}
-"Plug 'fishbullet/deoplete-ruby'
+ Plug 'fishbullet/deoplete-ruby'
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
@@ -81,7 +83,11 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'mileszs/ack.vim'
 " {{{
-  let g:ackprg = 'ag --nogroup --nocolor --column'
+  if executable("rg")
+    let g:ackprg = 'rg --vimgrep --no-heading'
+  else
+    let g:ackprg = 'ag --nogroup --nocolor --column'
+  endif
 " }}}
 
 " Languages/editing
@@ -114,7 +120,7 @@ Plug 'kassio/neoterm'
 " {{{
   let g:neoterm_run_tests_bg = 1
   let g:neoterm_raise_when_tests_fail = 1
-  "let g:neoterm_close_when_tests_succeed = 1
+  let g:neoterm_close_when_tests_succeed = 1
   let g:neoterm_rspec_lib_cmd = 'zeus rspec'
 
   nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
